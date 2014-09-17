@@ -2,6 +2,7 @@ module.exports.init = function () {
     return CityObj;
 };
 
+/* CONSTRUCTOR */
 function CityObj(bodyText, convertType) {
     this._googleGeoCodes = null;
 //    this._yandexGeoCodes = null;//example
@@ -21,11 +22,16 @@ function CityObj(bodyText, convertType) {
     if (convertType.provider && convertType.provider.toUpperCase() === 'GOOGLE') {
 
         //TODO сделать более умную выборку
-        this.convertFromGoogleGeoCode(bodyText)
-            .setGeoLatitude(this._googleGeoCodes.results[0].geometry.location.lat)
-            .setGeoLongitude(this._googleGeoCodes.results[0].geometry.location.lng)
-            .setName(this._googleGeoCodes.results[0].address_components[0].long_name)
-        ;
+        var geoObj = this.convertFromGoogleGeoCode(bodyText);
+        if(geoObj === null) {
+            return null;
+        } else {
+            geoObj
+                .setGeoLatitude(this._googleGeoCodes.results[0].geometry.location.lat)
+                .setGeoLongitude(this._googleGeoCodes.results[0].geometry.location.lng)
+                .setName(this._googleGeoCodes.results[0].address_components[0].long_name)
+            ;
+        }
 
         delete this._googleGeoCodes;
     }
@@ -33,13 +39,16 @@ function CityObj(bodyText, convertType) {
     return this;
 }
 
+/* PROVIDERS CONVERTING */
 CityObj.prototype.convertFromGoogleGeoCode = function (bodyText) {
-    this._googleGeoCodes = JSON.parse(bodyText, function (key, value) {
+    var error = false;
+    var parseBody = JSON.parse(bodyText, function (key, value) {
         switch (key) {
 
             case 'status' :
                 if (value !== 'OK') {
-                    throw 'Response status error';
+                    error = true;
+                    console.warn('Response status error');
                 }
 
                 break;
@@ -56,9 +65,15 @@ CityObj.prototype.convertFromGoogleGeoCode = function (bodyText) {
         }
     });
 
+    if(error) {
+        return null;
+    }
+
+    this._googleGeoCodes = parseBody;
     return this;
 };
 
+/* JSON Converters */
 CityObj.prototype.convertToJSON = function() {
     var city = this.city;
 
@@ -95,6 +110,7 @@ CityObj.prototype.convertoToJSON_LD = function () {
     return JSON.stringify(schema);
 };
 
+/* SETTERS */
 CityObj.prototype.setName = function (cityName) {
     this.city.name = cityName;
 
