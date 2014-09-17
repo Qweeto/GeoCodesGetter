@@ -15,7 +15,9 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
         var cityList = result.rocid.city;
 
         var parseOptions = {
-            provider: "GOOGLE", host: 'maps.googleapis.com', path: '/maps/api/geocode/json?'
+            provider: "GOOGLE"
+            , host: 'maps.googleapis.com'
+            , path: '/maps/api/geocode/json?'
         };
 
         cityList.forEach(function (obj) {
@@ -43,9 +45,8 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
                     })
                 ;
             } else {
-                throw 'PROVIDER IS NOT AVAILABLE';
+                throw 'ANOTHER PROVIDER WHILE IS NOT AVAILABLE';
             }
-
         });
     });
 });

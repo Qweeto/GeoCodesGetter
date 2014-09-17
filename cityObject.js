@@ -66,26 +66,25 @@ CityObj.prototype.convertToJSON = function() {
 };
 
 CityObj.prototype.convertoToJSON_LD = function () {
-
     var city = this.city,
         schema = {
             "@context": {
-                "name": "http://schema.org/name",
-                "description": "http://schema.org/description",
-                "image": {
-                    "@id": "http://schema.org/image",
-                    "@type": "@id"
-                },
-                "geo": "http://schema.org/geo",
-                "latitude": {
-                    "@id": "http://schema.org/latitude",
-                    "@type": "xsd:float"
-                },
-                "longitude": {
-                    "@id": "http://schema.org/longitude",
-                    "@type": "xsd:float"
-                },
-                "xsd": "http://www.w3.org/2001/XMLSchema#",
+                "name": "http://schema.org/name"
+                ,"description": "http://schema.org/description"
+                ,"image": {
+                    "@id": "http://schema.org/image"
+                    ,"@type": "@id"
+                }
+                ,"geo": "http://schema.org/geo"
+                ,"latitude": {
+                    "@id": "http://schema.org/latitude"
+                    ,"@type": "xsd:float"
+                }
+                ,"longitude": {
+                    "@id": "http://schema.org/longitude"
+                    ,"@type": "xsd:float"
+                }
+                ,"xsd": "http://www.w3.org/2001/XMLSchema#"
             }
         };
 
@@ -110,6 +109,18 @@ CityObj.prototype.setGeoLatitude = function (latitude) {
 
 CityObj.prototype.setGeoLongitude = function (longitude) {
     this.city.geo.longitude = longitude;
+
+    return this;
+};
+
+CityObj.prototype.setDescription = function(description) {
+    this.city.description = description;
+
+    return this;
+};
+
+CityObj.prototype.setImage = function(imageUrl) {
+    this.city.image = imageUrl;
 
     return this;
 };
