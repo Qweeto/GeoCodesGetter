@@ -2,41 +2,66 @@
  * Google geocoder latitude/longitude and name attributes for cities list (rocid.xml)
  * */
 var fs = require('fs')
-    ,xml2js = require('xml2js')
-    ,http = require('http')
-    ,httpResponce = require('./googleGeoCodeCity.js')
-    ,CityObject = require('./cityObject.js').init()
+    , xml2js = require('xml2js')
+    , http = require('http')
+    , httpResponce = require('./googleGeoCodeCity.js')
+    , CityObject = require('./cityObject.js').init()
 ;
 
 var parser = new xml2js.Parser();
-var requestsPerSec = 5;//TODO for free account 10 requests per second! I have not recommend to set less more than 15
+var requestsPerSec = 7;//TODO for free account 10 requests per second! I have not recommend to set less more than 15
+
+var writer = fs.createWriteStream('city.json', {flags: 'w'});
+writer.on('finish', function () {
+    console.log('writer finish completed.');
+});
+
+function write(text) {
+    var success = writer.write(text);
+
+    if (!success) {
+        writer.once('drain', write);
+    }
+}
 
 fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data) {
     parser.parseString(data, function (err, result) {
-        var cityList = result.rocid.city;
-        var index = cityList.length - 1;
+        var cityList = result.rocid.city
+            , index = 5//cityList.length - 1;
 
         const parseOptions = {
-            provider: "GOOGLE"
-            , host: 'maps.googleapis.com'
-            , path: '/maps/api/geocode/json?'
+            provider: "GOOGLE", host: 'maps.googleapis.com', path: '/maps/api/geocode/json?'
         };
 
-        //START
+        /* START */
         nextCity();
 
         function nextCity() {
-            setTimeout(function() {
-                if(index < 0) {
+            setTimeout(function () {
+                if (index < 0) {
+                    writer.end();
                     return;
                 }
 
-                parseCity(function() {
+                parseCity(function (jsonCity) {
+
+                    /* write to the file */
+                    if (jsonCity !== null) {
+                        if (index === cityList.length - 1) {
+                            write('[');
+                        } else if (index > 0) {
+                            write(jsonCity + ',');
+                        } else {
+                            write(jsonCity + ']');
+                        }
+                    }
+
                     nextCity();
                     index--;
                 });
-            }, 1000 / requestsPerSec );
+            }, 1000 / requestsPerSec);
         }
+
         function getCity(index) {
             return cityList[index];
         }
@@ -52,33 +77,32 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
             httpResponce
                 .getPage(googlePath)
                 .html(function (bodyText) {
-                    var cityObj = new CityObject(bodyText, {
+                    var jsonCity = null
+                        , cityObj = new CityObject(bodyText, {
                         provider: googlePath.provider
                     });
-                    if(cityObj !== null) {
-                        cityObj.setName(cityName.toUpperCase());//если не будет вызвана - добавит данные из гугла
-                        //                        var jsonCity = cityObj.convertToJSON();//simple
-                        var jsonCity = cityObj.convertoToJSON_LD();//progressive
 
-                        //FIXME: записывать этот json в файл?
-                        console.log(jsonCity);
+                    if (cityObj !== null && cityObj.name && cityObj.geo && cityObj.geo.latitude && cityObj.geo.longitude) {
+                        cityObj.setName(cityName.toUpperCase());//если не будет вызвана - добавит данные из гугла
+
+                        jsonCity = cityObj.convertToJSON();//simple
+//                        var jsonCity = cityObj.convertoToJSON_LD();//progressive
                     }
 
-                    callback();
+                    callback(jsonCity);
                 })
             ;
         }
 
         function parseCity(callback) {
-            var city = getCity(index);
-            var cityName = city.name[0].toLowerCase();
+            var city = getCity(index)
+                , cityName = city.name[0].toLowerCase();
 
             //TODO выделить в отдельный класс с проверками на провайдер
             if (parseOptions.provider.toUpperCase() === 'GOOGLE') {
-                console.log(city)
                 googleParse(cityName, callback);
             } else {
-                throw 'ANOTHER PROVIDER WHILE IS NOT AVAILABLE';
+                throw 'ANOTHER PROVIDER WHILE IS NOT EXIST';
             }
         }
     });

@@ -5,12 +5,14 @@ module.exports.init = function () {
 /* CONSTRUCTOR */
 function CityObj(bodyText, convertType) {
     this._googleGeoCodes = null;
-//    this._yandexGeoCodes = null;//example
+//    this._yandexGeoCodes = null;//example another provider
 
     this.city = {
         name: null,//Moscow
-        description: null,//"The Empire State Building is a 102-story landmark in New York City.",
-        image: null,//"http://www.civil.usherbrooke.ca/cours/gci215a/empire-state-building.jpg",
+        //TODO включить в будущем
+        //description: null,//"The Empire State Building is a 102-story landmark in New York City.",
+        //image: null,//"http://www.civil.usherbrooke.ca/cours/gci215a/empire-state-building.jpg",
+        //TODOEND
         geo: {
             latitude: null,//"40.75",
             longitude: null//"73.98"
@@ -20,12 +22,12 @@ function CityObj(bodyText, convertType) {
     if (!convertType) throw "Argument 'convertType' is not found!";
 
     if (convertType.provider && convertType.provider.toUpperCase() === 'GOOGLE') {
-
-        //TODO сделать более умную выборку
         var geoObj = this.convertFromGoogleGeoCode(bodyText);
+
         if(geoObj === null) {
             return null;
         } else {
+            //TODO сделать более умную выборку
             geoObj
                 .setGeoLatitude(this._googleGeoCodes.results[0].geometry.location.lat)
                 .setGeoLongitude(this._googleGeoCodes.results[0].geometry.location.lng)
@@ -48,7 +50,8 @@ CityObj.prototype.convertFromGoogleGeoCode = function (bodyText) {
             case 'status' :
                 if (value !== 'OK') {
                     error = true;
-                    console.warn('Response status error');
+                    console.warn('Response status error ' + value);
+                    return null;
                 }
 
                 break;
@@ -129,6 +132,7 @@ CityObj.prototype.setGeoLongitude = function (longitude) {
     return this;
 };
 
+//TODO включить в будущем
 CityObj.prototype.setDescription = function(description) {
     this.city.description = description;
 
@@ -140,3 +144,4 @@ CityObj.prototype.setImage = function(imageUrl) {
 
     return this;
 };
+//TODOEND
