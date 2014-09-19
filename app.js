@@ -34,6 +34,7 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
         };
 
         /* START */
+        console.log('start...');
         nextCity();
 
         function nextCity() {
@@ -46,6 +47,7 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
                 parseCity(function (jsonCity, error) {
 
                     if(error) {
+                        console.error('write error : ' + error.err);
                         write(']');
                         return;
                     }
