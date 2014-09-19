@@ -43,7 +43,12 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
                     return;
                 }
 
-                parseCity(function (jsonCity) {
+                parseCity(function (jsonCity, error) {
+
+                    if(error) {
+                        write(']');
+                        return;
+                    }
 
                     /* write to the file */
                     if (jsonCity !== null) {
@@ -78,9 +83,15 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
                 .getPage(googlePath)
                 .html(function (bodyText) {
                     var jsonCity = null
-                        , cityObj = new CityObject(bodyText, {
-                        provider: googlePath.provider
-                    });
+                        ,cityObj = null;
+
+                    try {
+                        cityObj = new CityObject(bodyText, {
+                            provider: googlePath.provider
+                        });
+                    } catch(e) {
+                        return callback(jsonCity, {err: e});
+                    }
 
                     if (cityObj !== null) {
                         cityObj.setName(cityName.toUpperCase());//если не будет вызвана - добавит данные из гугла
@@ -89,7 +100,7 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
 //                        var jsonCity = cityObj.convertoToJSON_LD();//progressive
                     }
 
-                    console.log(cityObj)
+                    console.log(cityObj);
 
                     callback(jsonCity);
                 })
