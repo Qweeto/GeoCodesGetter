@@ -24,7 +24,7 @@ function write(text) {
     }
 }
 
-fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data) {
+fs.readFile(__dirname + '/rocid_capital.xml', { encoding: 'utf8' }, function (err, data) {
     parser.parseString(data, function (err, result) {
         var cityList = result.rocid.city
             , index = cityList.length - 1;
