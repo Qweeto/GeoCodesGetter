@@ -27,7 +27,7 @@ function write(text) {
 fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data) {
     parser.parseString(data, function (err, result) {
         var cityList = result.rocid.city
-            , index = 5//cityList.length - 1;
+            , index = cityList.length - 1;
 
         const parseOptions = {
             provider: "GOOGLE", host: 'maps.googleapis.com', path: '/maps/api/geocode/json?'
@@ -82,12 +82,14 @@ fs.readFile(__dirname + '/rocid.xml', { encoding: 'utf8' }, function (err, data)
                         provider: googlePath.provider
                     });
 
-                    if (cityObj !== null && cityObj.name && cityObj.geo && cityObj.geo.latitude && cityObj.geo.longitude) {
+                    if (cityObj !== null) {
                         cityObj.setName(cityName.toUpperCase());//если не будет вызвана - добавит данные из гугла
 
                         jsonCity = cityObj.convertToJSON();//simple
 //                        var jsonCity = cityObj.convertoToJSON_LD();//progressive
                     }
+
+                    console.log(cityObj)
 
                     callback(jsonCity);
                 })

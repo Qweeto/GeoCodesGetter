@@ -48,6 +48,11 @@ CityObj.prototype.convertFromGoogleGeoCode = function (bodyText) {
         switch (key) {
 
             case 'status' :
+                if(value === 'OVER_QUERY_LIMIT') {
+                    error = true;
+                    throw 'Over query limit. Please try tomorrow';
+                }
+
                 if (value !== 'OK') {
                     error = true;
                     console.warn('Response status error ' + value);
