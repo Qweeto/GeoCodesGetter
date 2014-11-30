@@ -53,14 +53,14 @@ fs.readFile(__dirname + '/rocid_capital.xml', {encoding: 'utf8'}, function (erro
 					if (obj.error) {
 						console.log('write error : ' + obj.error.error);
 					} else if (!obj.value) {
-						console.log('jsonCity is null');
+						console.log('json city is null');
 					} else {
 						console.log(obj.value);
 
 						/* write to the file */
 						if (index === 0) {
 							write('[');
-						} else if (index < lastIndex) {
+						} else if (index < lastIndex - 1) {
 							write(obj.value + ',');
 						} else {
 							write(obj.value + ']');
