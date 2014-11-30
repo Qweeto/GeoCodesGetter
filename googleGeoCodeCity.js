@@ -1,26 +1,26 @@
 var http = require('http');
 
 module.exports.getPage = function (options) {
-    return {
-        html: function (callback) {
+	return {
+		html: function (callback) {
 
-            var req = http
-                    .get(options, function (res) {
-                        var bodyChunks = [];
-                        /*Buffer the body entirely for processing as a whole.*/
+			var req = http
+					.get(options, function (res) {
+						var bodyChunks = [];
 
-                        res
-                            .on('data', function (chunk) {
-                                bodyChunks.push(chunk);
-                            })
-                            .on('end', function () {
-                                var body = Buffer.concat(bodyChunks);
+						/*Buffer the body entirely for processing as a whole.*/
+						res
+							.on('data', function (chunk) {
+								bodyChunks.push(chunk);
+							})
+							.on('end', function () {
+								var body = Buffer.concat(bodyChunks);
 
-                                callback(String(body));
-                            })
-                        ;
-                    })
-                ;
-        }
-    }
+								callback(String(body));
+							})
+						;
+					})
+				;
+		}
+	}
 };
